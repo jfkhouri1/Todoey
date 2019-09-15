@@ -12,9 +12,17 @@ class ToDoListViewController: UITableViewController {
 
     var itemArray = ["To do list 1", "To do list 2", "To do list 3"]
     
+    var myUserDefaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Do any additional setup after loading the view.
+        
+        // retrieve saved ToDoListArray in the user default and store it in itemArray
+        if let defaults = myUserDefaults.array(forKey: "ToDoListArray") {
+            itemArray = defaults as! [String]
+        }
         
     }
 
@@ -32,9 +40,11 @@ class ToDoListViewController: UITableViewController {
             
             // add new item to the list
             print("Placeholder: \(newItemTextField.placeholder)")
-            print("Added Item: \(newItemTextField.text)")
+            print("Added Item: \(String(describing: newItemTextField.text))")
             
+            // append new item to itemArray and store it in userdefaults and update screen
             self.itemArray.append(newItemTextField.text ?? "")
+            self.myUserDefaults.set(self.itemArray, forKey: "ToDoListArray")
             self.tableView.reloadData()
             
             
@@ -64,8 +74,6 @@ class ToDoListViewController: UITableViewController {
     //TODO: Declare cellForRowAtIndexPath here:"
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoItemCell", for: indexPath)
     
