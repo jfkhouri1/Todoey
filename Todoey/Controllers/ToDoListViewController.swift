@@ -10,8 +10,11 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 
-    var itemArray = ["To do list 1", "To do list 2", "To do list 3"]
     
+    var itemArray = [TodoItem]()
+    let myUserDefaultsKey = "ToDoListArray"
+
+
     var myUserDefaults = UserDefaults.standard
     
     override func viewDidLoad() {
@@ -20,9 +23,13 @@ class ToDoListViewController: UITableViewController {
         // Do any additional setup after loading the view.
         
         // retrieve saved ToDoListArray in the user default and store it in itemArray
-        if let defaults = myUserDefaults.array(forKey: "ToDoListArray") {
-            itemArray = defaults as! [String]
-        }
+        
+// Commenting out all use of myUserDefaults because it caused my code to crash and then learned that my data is too complex for user defaults and hence should not be used.
+        
+//        if let items = myUserDefaults.array(forKey: myUserDefaultsKey) as? [TodoItem] {
+//            itemArray = items
+//        }
+
         
     }
 
@@ -38,13 +45,14 @@ class ToDoListViewController: UITableViewController {
         let addAction = UIAlertAction(title: "Add Item", style: .default) { (alertAction) in
             // what will happen once the user hits the action "Add Item" button on our alert
             
-            // add new item to the list
-            print("Placeholder: \(newItemTextField.placeholder)")
-            print("Added Item: \(String(describing: newItemTextField.text))")
-            
             // append new item to itemArray and store it in userdefaults and update screen
-            self.itemArray.append(newItemTextField.text ?? "")
-            self.myUserDefaults.set(self.itemArray, forKey: "ToDoListArray")
+            let item = TodoItem()
+            item.itemDescription = newItemTextField.text ?? ""
+            item.fCompleted = false
+            
+            self.itemArray.append(item)
+
+//            self.myUserDefaults.set(self.itemArray, forKey: self.myUserDefaultsKey)
             self.tableView.reloadData()
             
             
@@ -77,7 +85,16 @@ class ToDoListViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoItemCell", for: indexPath)
     
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = itemArray[indexPath.row].itemDescription
+
+        
+        if itemArray[indexPath.row].fCompleted {
+            // check mark item because it is completed
+            cell.accessoryType = .checkmark
+        } else {
+            // else no checkmark for this item
+            cell.accessoryType = .none
+        }
         
         return cell
     }
@@ -95,9 +112,11 @@ class ToDoListViewController: UITableViewController {
         
         if (tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark) {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            itemArray[indexPath.row].fCompleted = false
             
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            itemArray[indexPath.row].fCompleted = true
         }
         
         // deselect the current cell
